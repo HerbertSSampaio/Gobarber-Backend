@@ -1,7 +1,8 @@
 /* eslint-disable camelcase */
 import { Router } from 'express';
 import bodyParser from 'body-parser';
-import AuthenticateUserService from '../services/AuthenticateUserService';
+import AuthenticateUserService from '@modules/users/services/AuthenticateUserService';
+import UsersRepository from '@modules/users/infra/typeorm/repositories/UsersRepository';
 
 const sessionsRouter = Router();
 
@@ -9,8 +10,10 @@ const jsonParser = bodyParser.json();
 
 sessionsRouter.post('/', jsonParser, async (request, response) => {
     const { email, password } = request.body;
-
-    const authenticateUserService = new AuthenticateUserService();
+    const usersRepository = new UsersRepository();
+    const authenticateUserService = new AuthenticateUserService(
+        usersRepository,
+    );
 
     const { user, token } = await authenticateUserService.execute({
         email,
