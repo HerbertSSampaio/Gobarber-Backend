@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
 import { Router } from 'express';
 import bodyParser from 'body-parser';
+import { container } from 'tsyringe';
 import AuthenticateUserService from '@modules/users/services/AuthenticateUserService';
-import UsersRepository from '@modules/users/infra/typeorm/repositories/UsersRepository';
 
 const sessionsRouter = Router();
 
@@ -10,10 +10,7 @@ const jsonParser = bodyParser.json();
 
 sessionsRouter.post('/', jsonParser, async (request, response) => {
     const { email, password } = request.body;
-    const usersRepository = new UsersRepository();
-    const authenticateUserService = new AuthenticateUserService(
-        usersRepository,
-    );
+    const authenticateUserService = container.resolve(AuthenticateUserService);
 
     const { user, token } = await authenticateUserService.execute({
         email,
