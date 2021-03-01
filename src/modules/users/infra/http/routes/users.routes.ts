@@ -1,64 +1,25 @@
 import { Router } from 'express';
 import multer from 'multer';
-import bodyParser from 'body-parser';
 import uploadConfig from '@config/upload';
-import { container } from 'tsyringe';
+import bodyParser from 'body-parser';
+import UsersController from '../controllers/UsersController';
+import UserAvatarController from '../controllers/UserAvatarController';
 
-import UpdateUserAvatarService from '@modules/users/services/UpdateUserAvatarService';
-
-import CreateUserService from '@modules/users/services/CreateUserService';
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 
 const usersRouter = Router();
-const upload = multer(uploadConfig);
-
 const jsonParser = bodyParser.json();
+const upload = multer(uploadConfig);
+const usersController = new UsersController();
+const userAvatarController = new UserAvatarController();
 
-usersRouter.post('/', jsonParser, async (request, response) => {
-    const { name, email, password } = request.body;
-    const createUser = container.resolve(CreateUserService);
-
-    const user = await createUser.execute({
-        name,
-        email,
-        password,
-    });
-
-    const userWithoutPassword = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-    };
-
-    return response.json(userWithoutPassword);
-});
+usersRouter.post('/', jsonParser, usersController.create);
 
 usersRouter.patch(
     '/avatar',
     ensureAuthenticated,
     upload.single('avatar'),
-    async (request, response) => {
-        try {
-            const updateUserAvatar = container.resolve(UpdateUserAvatarService);
-            const user = await updateUserAvatar.execute({
-                userId: request.user.id,
-                avatarFilename: request.file.filename,
-            });
-            const userWithoutPassword = {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                created_at: user.created_at,
-                updated_at: user.updated_at,
-            };
-
-            return response.json(userWithoutPassword);
-        } catch (err) {
-            return response.status(400).json({ error: err.message });
-        }
-    },
+    userAvatarController.update,
 );
 
 export default usersRouter;
