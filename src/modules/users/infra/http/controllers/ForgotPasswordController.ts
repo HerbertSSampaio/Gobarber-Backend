@@ -9,7 +9,6 @@ export default class ForgotPasswordController {
         response: Response,
     ): Promise<Response> {
         const { email } = request.body;
-
         const sendForgotPasswordEmail = container.resolve(
             SendForgotPasswordEmailService,
         );
