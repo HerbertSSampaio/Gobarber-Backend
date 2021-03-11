@@ -1,10 +1,10 @@
 import { getRepository, Repository, Raw } from 'typeorm';
 
 import IAppointmentsRepository from '@modules/appointments/repositories/IAppointmentsRepository';
-import IFindAllInDayFromProviderDTO from '@modules/appointments/dtos/IFindAllInDayFromProviderDTO';
 import ICreateAppointmentDTO from '@modules/appointments/dtos/ICreateAppointmentDTO';
 
 import IFindAllInMonthFromProviderDTO from '@modules/appointments/dtos/IFindAllInMonthFromProviderDTO';
+import IFindAllInDayFromProviderDTO from '@modules/appointments/dtos/IFindAllInDayFromProviderDTO';
 import Appointment from '../entities/Appointment';
 
 class AppointmentsRepository implements IAppointmentsRepository {
@@ -19,18 +19,7 @@ class AppointmentsRepository implements IAppointmentsRepository {
             where: { date },
         });
 
-        return findAppointment || undefined;
-    }
-
-    public async create({
-        provider_id,
-        date,
-    }: ICreateAppointmentDTO): Promise<Appointment> {
-        const appointment = this.ormRepository.create({ provider_id, date });
-
-        await this.ormRepository.save(appointment);
-
-        return appointment;
+        return findAppointment;
     }
 
     public async findAllInMonthFromProvider({
@@ -45,7 +34,7 @@ class AppointmentsRepository implements IAppointmentsRepository {
                 provider_id,
                 date: Raw(
                     dateFieldName =>
-                        `to_char(${dateFieldName}, 'MM-YYYY') = '${parsedMonth}-${year}'`,
+                        `to_char(${dateFieldName}, MM-YYYY) = '${parsedMonth}-${year}'`,
                 ),
             },
         });
@@ -67,12 +56,28 @@ class AppointmentsRepository implements IAppointmentsRepository {
                 provider_id,
                 date: Raw(
                     dateFieldName =>
-                        `to_char(${dateFieldName}, 'DD-MM-YYYY') = '${parsedDay}-${parsedMonth}-${year}'`,
+                        `to_char(${dateFieldName}, DD-MM-YYYY) = '${parsedDay}-${parsedMonth}-${year}'`,
                 ),
             },
         });
 
         return appointments;
+    }
+
+    public async create({
+        provider_id,
+        user_id,
+        date,
+    }: ICreateAppointmentDTO): Promise<Appointment> {
+        const appointment = this.ormRepository.create({
+            provider_id,
+            user_id,
+            date,
+        });
+
+        await this.ormRepository.save(appointment);
+
+        return appointment;
     }
 }
 
