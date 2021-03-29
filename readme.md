@@ -21,7 +21,7 @@
 
 ## 👨🏻‍💻 About the project
 
-- <p style="color: red;">Brief explanation about the project</p>
+- <p style="color: red;">GoBarber API is a scheduling application that is used by hairdressers on the web version and clients on the mobile version</p>
 
 To see the **web client**, click here: [GoBarber Web](https://github.com/HerbertSousa/Go-Barber-ReactJS)</br>
 To see the **mobile client**, click here: [GoBarber Mobile](https://github.com/HerbertSousa/Go-Barber-ReactNative)
